@@ -1,6 +1,8 @@
 <?php
 namespace JaguarSoft\LaravelEnvLoader\Model;
 
+use JaguarSoft\LaravelEnvLoader\DotenvLoader;
+
 class VarEnv 
 {
     public $tipo;
@@ -9,6 +11,7 @@ class VarEnv
     public $codigo_padre;
     public $padre;
     public $bloqueado = true;
+    public $comentario = '';
 
     public static function from($codigo, $valor) {
         $VarEnv = new VarEnv();
@@ -18,22 +21,31 @@ class VarEnv
     }
 
     public function val() {
+        $valor = $this->valor;
+        $DotenvLoader = new DotenvLoader(null);
+        $valor = is_string($valor) ? $DotenvLoader->normaliseVariable($this->codigo, $valor) : $valor;
         $tipo = strtolower($this->tipo);
         switch($tipo) {
             case 'integer':
-                return (int) $this->valor;
+                return (int) $valor;
                 break;
             case 'boolean':
-                return (bool) $this->valor;
+                return (bool) $valor;
                 break;
             case 'float':
-                return (float) $this->valor;
+                return (float) $valor;
                 break;
             case 'string':
-                return (string) $this->valor;
+                return (string) $valor;
+                break;
+            case 'json':                
+                if(substr($valor,0,1) == "'" && substr($valor,strlen($valor)-1,1)== "'") {
+                    $valor = substr($valor,1,strlen($valor)-2);
+                }                
+                return json_decode($valor, true);
                 break;
             default:
-                return $this->valor;
+                return $valor;
         }
     }
 }
