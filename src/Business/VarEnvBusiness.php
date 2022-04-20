@@ -12,8 +12,7 @@ class VarEnvBusiness {
 
 	function __construct(VarEnvService $Service){
 		$this->Service = $Service;
-		$this->VarEnvs = $this->Service->listar();
-		//$this->setEnvs();
+		$this->VarEnvs = $this->Service->listar();		
 	}
 
 	public function setEnvs() {
@@ -22,8 +21,7 @@ class VarEnvBusiness {
         if (!is_string($file)) $file = '.env';    
         $filePath = rtrim($path, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$file;        
         $loader = new DotenvLoader($filePath, true);
-        $envs = $loader->readVariables();
-		//dd($this->VarEnvs);
+        $envs = $loader->readVariables();		
 		foreach($this->VarEnvs as $VarEnv) {
 			if(isset($envs[$VarEnv->codigo])) continue;
 			$loader->setEnvironmentVariable($VarEnv->codigo, $VarEnv->valor);
@@ -44,15 +42,24 @@ class VarEnvBusiness {
 			}
 		};
 		return false;
+	} 
+
+	function hasOrEnv($codigo) : bool {		
+		return 	$this->has($codigo) || isset($_ENV[$codigo]);
 	}
 
-	function get($codigo, $default = null) : ?VarEnv {		
+	function get($codigo, $default = null) {
 		foreach($this->VarEnvs as $VarEnv) {
 			if($VarEnv->codigo === $codigo) {
 				return $VarEnv->val();
 			}
 		};
-		return VarEnv::from($codigo, env($codigo, $default));
+		return env($codigo, $default);
+	}
+
+	function getOrEnv($codigo, $default = null) {
+		return 	$this->has($codigo) ? 
+				$this->get($codigo) : (isset($_ENV[$codigo]) ? $_ENV[$codigo] : $default);
 	}
 
 	function post($codigo, $valor) {
@@ -68,5 +75,4 @@ class VarEnvBusiness {
 	function delete($codigo, $valor) {
 		$this->Service->borrar($codigo, $valor);
 	}
-   
 }	
