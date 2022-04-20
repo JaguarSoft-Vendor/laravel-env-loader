@@ -1,0 +1,26 @@
+{
+    "name": "jaguarsoft/laravel-env-loader",
+    "description": "Loads Laravel environment variables from Custom Service",
+    "keywords": ["env", "dotenv", "laravel", "environment"],    
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Laurence",
+            "email": "laurence@jaguarsoft.pe"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "JaguarSoft\\LaravelEnvLoader\\": "src/"
+        }
+    },
+    "require": {
+        "php": "^5.3.9 || ^7.0 || ^8.0",
+        "symfony/polyfill-ctype": "^1.17"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "dev"
+        }
+    }
+}
