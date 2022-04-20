@@ -57,7 +57,7 @@ class DotenvLoader extends Loader {
             apache_setenv($name, $value);
         }
 
-        if (function_exists('putenv')) {
+        if (function_exists('putenv') && is_string($value)) {
             putenv("$name=$value");
         }
 
