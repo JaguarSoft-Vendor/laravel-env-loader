@@ -21,5 +21,14 @@ class JaguarVarBusiness {
 			return $this->business->getOrEnv($codigo, $default);
 		}
 	}
+
+	function all() {
+		$envs = [];
+		foreach($this->business->all() as $VarEnv) {
+			$envs[$VarEnv->codigo] = $VarEnv->val();
+			//$envs[$VarEnv->codigo] = $VarEnv;
+		}
+		return $envs;
+	}
    
 }	
