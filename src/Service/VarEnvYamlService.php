@@ -8,7 +8,7 @@ use JaguarSoft\LaravelEnvLoader\DotenvLoader;
 use Illuminate\Contracts\Foundation\Application;
 use Exception;
 use Symfony\Component\Yaml\Yaml;
-
+use Symfony\Component\Yaml\Exception\ParseException;
 
 class VarEnvYamlService implements VarEnvService {
 	protected $app;
@@ -20,13 +20,18 @@ class VarEnvYamlService implements VarEnvService {
 	function listar() {
 		$varenvs = [];
 		$envFile = $this->app->environmentFile();
-		//dd($envFile);
-		$path = private_path("config/$envFile.yml");
+		$path = env('VARENV_DIR','');		
+		$path = base_path($path).($path ? DIRECTORY_SEPARATOR.$envFile.'.yml' : $envFile.'.yml');
 		if(!file_exists($path)) return [];
-		$envs = Yaml::parse(file_get_contents($path));
+		$envs = [];
+        try {
+            $envs = Yaml::parse(file_get_contents($path), Yaml::PARSE_CONSTANT);        
+        } catch (ParseException $e) {
+            //dd($e->getMessage());
+        }
 		foreach($envs as $name => $value) {
 			array_push($varenvs, VarEnv::from($name,$value));
-		}
+		}		
 		return $varenvs;
 	}
 
