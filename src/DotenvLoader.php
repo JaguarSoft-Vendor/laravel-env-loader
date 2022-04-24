@@ -53,6 +53,7 @@ class DotenvLoader extends Loader {
     {
         // If PHP is running as an Apache module and an existing
         // Apache environment variable exists, overwrite it
+        if(is_bool($value)) { $value = $value ? 'true' : 'false'; }        
         if (function_exists('apache_getenv') && function_exists('apache_setenv') && apache_getenv($name) !== false) {
             apache_setenv($name, $value);
         }
