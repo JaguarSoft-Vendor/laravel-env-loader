@@ -21,17 +21,16 @@ class VarEnvBusiness {
         if (!is_string($file)) $file = '.env';    
         $filePath = rtrim($path, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$file;        
         $loader = new DotenvLoader($filePath, true);
-        $envs = $loader->readVariables();		
+        $envs = $loader->readVariables();
 		foreach($this->VarEnvs as $VarEnv) {
 			if(isset($envs[$VarEnv->codigo])) continue;
-			$loader->setEnvironmentVariable($VarEnv->codigo, $VarEnv->valor);
+			$loader->setEnvironmentVariable($VarEnv->codigo, $VarEnv->val());
 		}
 	}
 
-	function all() {
-		return array_map(function($Var){
-			return $Var;
-			return $Var->val();
+	function all($value = false) {
+		return array_map(function($Var) use ($value) {			
+			return $value === true ? $Var->val() : $Var;			
 		},$this->VarEnvs);
 	}
 
