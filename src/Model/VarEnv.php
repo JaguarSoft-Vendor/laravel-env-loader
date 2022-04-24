@@ -23,7 +23,7 @@ class VarEnv
     public function val() {
         $valor = $this->valor;
         $DotenvLoader = new DotenvLoader(null);
-        $valor = is_string($valor) ? $DotenvLoader->normaliseVariable($this->codigo, $valor) : $valor;
+        //$valor = is_string($valor) ? $DotenvLoader->normaliseVariable($this->codigo, $valor) : $valor;
         $tipo = strtolower($this->tipo);
         switch($tipo) {
             case 'integer':
