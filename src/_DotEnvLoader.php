@@ -4,6 +4,7 @@ namespace JaguarSoft\LaravelEnvLoader;
 use Dotenv\Loader;
 use Illuminate\Support\Str;
 
+
 class DotenvLoader extends Loader {
 
 	public function normaliseVariable($name, $value = null)
