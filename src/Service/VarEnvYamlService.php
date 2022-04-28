@@ -3,7 +3,6 @@ namespace JaguarSoft\LaravelEnvLoader\Service;
 
 use JaguarSoft\LaravelEnvLoader\Model\VarEnv;
 use JaguarSoft\LaravelEnvLoader\Contract\VarEnvService;
-use JaguarSoft\LaravelEnvLoader\DotenvLoader;
 
 use Illuminate\Contracts\Foundation\Application;
 use Exception;

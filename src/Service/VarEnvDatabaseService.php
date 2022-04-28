@@ -3,7 +3,7 @@ namespace JaguarSoft\LaravelEnvLoader\Service;
 
 use JaguarSoft\LaravelEnvLoader\Model\VarEnv;
 use JaguarSoft\LaravelEnvLoader\Contract\VarEnvService;
-use JaguarSoft\LaravelEnvLoader\DotenvLoader;
+use JaguarSoft\LaravelEnvLoader\DotEnvLoader;
 use JaguarSoft\LaravelEnvLoader\Model\Env as Model;
 use JaguarSoft\LaravelEnvLoader\Model\VarEnvBuilder;
 
@@ -14,7 +14,7 @@ class VarEnvDatabaseService implements VarEnvService {
 	protected $loader;
 
 	function __construct(Application $app){		
-		$this->loader = new DotenvLoader('.env');
+		$this->loader = new DotEnvLoader('.env');
 	}
 
 	function listar() {

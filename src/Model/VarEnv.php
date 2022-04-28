@@ -1,7 +1,7 @@
 <?php
 namespace JaguarSoft\LaravelEnvLoader\Model;
 
-use JaguarSoft\LaravelEnvLoader\DotenvLoader;
+use JaguarSoft\LaravelEnvLoader\DotEnvLoader;
 
 class VarEnv 
 {
@@ -22,8 +22,8 @@ class VarEnv
 
     public function val() {
         $valor = $this->valor;
-        $DotenvLoader = new DotenvLoader(null);
-        //$valor = is_string($valor) ? $DotenvLoader->normaliseVariable($this->codigo, $valor) : $valor;
+        $DotEnvLoader = new DotEnvLoader(null);
+        //$valor = is_string($valor) ? $DotEnvLoader->normaliseVariable($this->codigo, $valor) : $valor;
         $tipo = strtolower($this->tipo);
         switch($tipo) {
             case 'integer':

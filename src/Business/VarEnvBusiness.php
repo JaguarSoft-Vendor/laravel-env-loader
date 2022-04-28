@@ -1,7 +1,7 @@
 <?php 
 namespace JaguarSoft\LaravelEnvLoader\Business;
 
-use JaguarSoft\LaravelEnvLoader\DotenvLoader;
+use JaguarSoft\LaravelEnvLoader\DotEnvLoader;
 use JaguarSoft\LaravelEnvLoader\Contract\VarEnvService;
 use JaguarSoft\LaravelEnvLoader\Model\VarEnv;
 
@@ -20,7 +20,7 @@ class VarEnvBusiness {
         $file = app()->environmentFile();
         if (!is_string($file)) $file = '.env';    
         $filePath = rtrim($path, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$file;        
-        $loader = new DotenvLoader($filePath, true);
+        $loader = new DotEnvLoader($filePath, true);
         $envs = $loader->readVariables();
 		foreach($this->VarEnvs as $VarEnv) {
 			if(isset($envs[$VarEnv->codigo])) continue;

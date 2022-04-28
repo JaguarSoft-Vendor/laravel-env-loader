@@ -5,7 +5,7 @@ use Dotenv\Loader;
 use Illuminate\Support\Str;
 
 
-class DotenvLoader extends Loader {
+class DotEnvLoader extends Loader {
 
 	public function normaliseVariable($name, $value = null)
     {
