@@ -30,7 +30,20 @@ class VarEnv
                 return (int) $valor;
                 break;
             case 'boolean':
-                return (bool) $valor;
+                switch($valor) {
+                    case 'true': 
+                    case 'si':
+                    case '1':
+                        return true; 
+                        break;
+                    case 'false':
+                    case 'no':
+                    case '0':
+                        return false;
+                        break;
+                    default:
+                        return (bool) $valor;                        
+                }            
                 break;
             case 'float':
                 return (float) $valor;
