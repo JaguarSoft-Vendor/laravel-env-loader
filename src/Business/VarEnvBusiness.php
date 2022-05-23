@@ -53,12 +53,11 @@ class VarEnvBusiness {
 				return $VarEnv->val();
 			}
 		};
-		return env($codigo, $default);
+		return $default;
 	}
 
 	function getOrEnv($codigo, $default = null) {
-		return 	$this->has($codigo) ? 
-				$this->get($codigo) : (isset($_ENV[$codigo]) ? $_ENV[$codigo] : $default);
+		return 	$this->has($codigo) ? $this->get($codigo) : env($codigo,$default);
 	}
 
 	function post($codigo, $valor) {
