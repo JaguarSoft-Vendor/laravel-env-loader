@@ -50,6 +50,26 @@ class DotEnvLoader extends Loader {
         return $_envs;
     }
 
+    public function readLines()
+    {
+        $this->ensureFileIsReadable();        
+        $filePath = $this->filePath;
+        //$lines = $this->readLinesFromFile($filePath);
+        $autodetect = ini_get('auto_detect_line_endings');
+        ini_set('auto_detect_line_endings', '1');
+        $lines = file($filePath, FILE_IGNORE_NEW_LINES);
+        $env_line = [];
+        ini_set('auto_detect_line_endings', $autodetect);
+        foreach ($lines as $k => $line) {
+            if(empty($line)) continue;
+            if($this->isComment($line)) continue;
+            list($name, $value) = $this->normaliseEnvironmentVariable($line, null);
+            $env_line[$name] = $k;
+        }
+
+        return $env_line;
+    }
+
     public function setEnvironmentVariable($name, $value = null)
     {
         // If PHP is running as an Apache module and an existing
