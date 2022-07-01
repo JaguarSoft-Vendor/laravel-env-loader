@@ -3,6 +3,7 @@ namespace JaguarSoft\LaravelEnvLoader\Service;
 
 use JaguarSoft\LaravelEnvLoader\Model\VarEnv;
 use JaguarSoft\LaravelEnvLoader\Contract\VarEnvService;
+use JaguarSoft\LaravelEnvLoader\Model\Env;
 
 use Illuminate\Contracts\Foundation\Application;
 use Exception;
@@ -44,5 +45,17 @@ class VarEnvYamlService implements VarEnvService {
 
 	function borrar($codigo) {
 		throw new Exception("VarEnvYamlService.borrar No Implementado");
+	}
+
+	function crearEnv(Env $Env) {
+		throw new Exception("VarEnvYamlService.crearEnv No Implementado");
+	}
+
+	function actualizarEnv(Env $Env) {
+		throw new Exception("VarEnvYamlService.actualizarEnv No Implementado");
+	}
+
+	function existe($codigo) {
+		throw new Exception("VarEnvYamlService.existe No Implementado");	
 	}
 }	

@@ -60,4 +60,31 @@ class VarEnvDatabaseService implements VarEnvService {
 			throw new Exception("Variable Env Bloqueada");			
 		}
 	}
+
+	function crearEnv(Model $Env) {
+		$Env1 = Model::where('codigo',$Env->codigo)->first();
+		if(!$Env1) {
+			$Env->save();
+			return $Env;
+		} else {
+			throw new Exception("Variable Env Existente");			
+		}
+	}
+
+	function actualizarEnv(Model $Env) {
+		$Env1 = Model::where('codigo',$Env->codigo)->first();
+		if($Env1 && !$Env1->bloqueado) {
+			$Env1->tipo = $Env->tipo;
+			$Env1->valor = $Env->valor;
+			$Env1->comentario = $Env->comentario;
+			$Env1->save();
+			return $Env;
+		} else {
+			throw new Exception("Variable Env Bloqueada");			
+		}
+	}
+
+	function existe($codigo) {
+		return Model::where('codigo',$codigo)->first();
+	}
 }	
