@@ -18,6 +18,7 @@ class Env extends Model
             ,'valor'
             ,'codigo_padre'
             ,'bloqueado'
+            ,'comentario'
         ];
     protected $visible  = 
         [
@@ -27,6 +28,7 @@ class Env extends Model
             ,'valor'
             ,'codigo_padre'
             ,'bloqueado'
+            ,'comentario'
         ];
 
     protected $informative = ['codigo'];
