@@ -58,7 +58,27 @@ class VarEnvBusiness {
 
 	function getOrEnv($codigo, $default = null) {
 		return 	$this->has($codigo) ? $this->get($codigo) : 
-				(isset($_ENV[$codigo]) ? $_ENV[$codigo] : env($codigo,$default));
+				(isset($_ENV[$codigo]) ? $this->handleEnv($_ENV[$codigo]) : env($codigo,$default));
+	}
+
+	protected function handleEnv($value) {
+		if(!is_string($value)) return $value;
+		switch (strtolower($value)) {
+            case 'true':
+            case '(true)':
+                return true;
+            case 'false':
+            case '(false)':
+                return false;
+            case 'empty':
+            case '(empty)':
+                return '';
+            case 'null':
+            case '(null)':
+                return null;
+            default:
+            	return $value;
+        }
 	}
 
 	function post($codigo, $valor) {
