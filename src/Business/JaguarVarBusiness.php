@@ -53,5 +53,9 @@ class JaguarVarBusiness {
 			return in_array($this->env($key), $arr);
 		}, $callback, $else);
 	}
+
+	public function ifEnv($key,$comp,$if,$else = null) {
+		return $this->env($key) === $comp ? $if : $else;
+	}
    
 }	

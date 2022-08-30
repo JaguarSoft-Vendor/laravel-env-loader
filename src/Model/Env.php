@@ -33,4 +33,8 @@ class Env extends Model
 
     protected $informative = ['codigo'];
     protected $name = 'Variable de Entorno';
+
+    public static function builder(){
+        return new EnvBuilder;
+    }
 }
