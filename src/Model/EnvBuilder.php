@@ -50,8 +50,16 @@ class EnvBuilder {
         return $this;
     }
 
-    public function tipoBoolean() {
+    public function tipoBoolean($valor = null) {
         return $this->tipo('boolean');
+        if(!is_null($valor)){
+            if(is_bool($valor)){
+                $this->valor($valor ? 'true' : 'false');
+            } else 
+            if(is_int($valor)) {
+                $this->valor($valor);
+            }
+        }
     }
 
     public function tipoString() {
