@@ -16,7 +16,7 @@ class EnvLoaderServiceProvider extends ServiceProvider {
     public function boot() {
 
     	$this->publishes([
-            __DIR__.'/../database/migrations/create-envs-table.php.stub' => $this->getMigrationFileName('create-envs-table.php'),
+            __DIR__.'/../../database/migrations/create-envs-table.php.stub' => $this->getMigrationFileName('create-envs-table.php'),
         ], 'migrations');
     }
 
