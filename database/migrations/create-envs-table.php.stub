@@ -1,0 +1,39 @@
+<?php
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+use Spatie\Permission\PermissionRegistrar;
+
+class CreateEnvsTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        if(!Schema::hasTable('tb_envs')){
+            Schema::create('tb_envs', function (Blueprint $table) {
+                $table->increments('id_env');
+                $table->string('tipo', 15)->nullable();
+                $table->string('codigo', 50);
+                $table->text('valor')->nullable();
+                $table->string('codigo_padre', 50)->nullable();
+                $table->boolean('bloqueado')->default('1');
+                $table->string('comentario', 250)->nullable();
+            });
+        }
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('tb_envs');
+    }
+}
