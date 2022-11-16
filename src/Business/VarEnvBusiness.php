@@ -5,6 +5,10 @@ use JaguarSoft\LaravelEnvLoader\DotEnvLoader;
 use JaguarSoft\LaravelEnvLoader\Contract\VarEnvService;
 use JaguarSoft\LaravelEnvLoader\Model\VarEnv;
 
+use Dotenv\Environment\DotenvFactory;
+use Dotenv\Environment\Adapter\ApacheAdapter;
+use Dotenv\Environment\Adapter\EnvConstAdapter;
+use Dotenv\Environment\Adapter\ServerConstAdapter;
 
 class VarEnvBusiness {
 	protected $Service;	
@@ -20,10 +24,13 @@ class VarEnvBusiness {
         $file = app()->environmentFile();
         if (!is_string($file)) $file = '.env';    
         $filePath = rtrim($path, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$file;        
-        $loader = new DotEnvLoader($filePath, true);
+        $loader = new DotEnvLoader(
+        	[$filePath],
+        	new DotenvFactory([new ApacheAdapter(), new EnvConstAdapter(),new ServerConstAdapter()]), 
+        	true);
         $envs = $loader->readVariables();
 		foreach($this->VarEnvs as $VarEnv) {
-			if(isset($envs[$VarEnv->codigo])) continue;
+			if(isset($envs[$VarEnv->codigo])) continue; // No sobreescribe variable .env
 			$loader->setEnvironmentVariable($VarEnv->codigo, $VarEnv->val());
 		}
 	}
@@ -58,27 +65,7 @@ class VarEnvBusiness {
 
 	function getOrEnv($codigo, $default = null) {
 		return 	$this->has($codigo) ? $this->get($codigo) : 
-				(isset($_ENV[$codigo]) ? $this->handleEnv($_ENV[$codigo]) : env($codigo,$default));
-	}
-
-	protected function handleEnv($value) {
-		if(!is_string($value)) return $value;
-		switch (strtolower($value)) {
-            case 'true':
-            case '(true)':
-                return true;
-            case 'false':
-            case '(false)':
-                return false;
-            case 'empty':
-            case '(empty)':
-                return '';
-            case 'null':
-            case '(null)':
-                return null;
-            default:
-            	return $value;
-        }
+				(isset($_ENV[$codigo]) ? DotEnvLoader::env($_ENV[$codigo]) : env($codigo,$default));
 	}
 
 	function post($codigo, $valor) {
