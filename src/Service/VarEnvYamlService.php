@@ -20,8 +20,8 @@ class VarEnvYamlService implements VarEnvService {
 	function listar() {
 		$varenvs = [];
 		$envFile = $this->app->environmentFile();
-		$path = env('VARENV_DIR','');		
-		$path = base_path($path).($path ? DIRECTORY_SEPARATOR.$envFile.'.yml' : $envFile.'.yml');
+		$path = env('VARENV_DIR','');	
+		$path = base_path((!empty($path) ? DIRECTORY_SEPARATOR : '').$envFile.'.yml');		
 		if(!file_exists($path)) return [];
 		$envs = [];
         try {
