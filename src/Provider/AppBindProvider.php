@@ -19,7 +19,7 @@ class AppBindProvider extends ServiceProvider {
             [
             'yaml' => 'JaguarSoft\LaravelEnvLoader\Service\VarEnvYamlService',
             'database' => 'JaguarSoft\LaravelEnvLoader\Service\VarEnvDatabaseService'
-            ][env('VARENV_SERVICE','yaml')]
+            ][env('VARENV_SERVICE','database')]
         );
 
         $this->app->singleton('JaguarVarBusiness', function(Container $container){        
