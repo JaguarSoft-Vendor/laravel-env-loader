@@ -3,11 +3,18 @@ namespace JaguarSoft\LaravelEnvLoader;
 
 use Dotenv\Loader;
 use Illuminate\Support\Str;
-
+use Dotenv\Environment\DotenvFactory;
 
 class DotEnvLoader extends Loader {
 
-	public function normaliseVariable($name, $value = null)
+    public function __construct($filePath)
+    {
+        $this->filePaths = [$filePath];
+        $this->envFactory = new DotenvFactory();
+        $this->setImmutable(false);
+    }
+
+    public function normaliseVariable($name, $value = null)
     {
         list($name, $value) = $this->normaliseEnvironmentVariable($name, $value);
         return $this->env($value);
