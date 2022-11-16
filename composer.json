@@ -16,7 +16,7 @@
     },
     "require": {
         "php": "^5.3.9 || ^7.0 || ^8.0",
-        "vlucas/phpdotenv": "^2.2"
+        "vlucas/phpdotenv": "^3.3"
     },
     "extra": {
         "branch-alias": {
