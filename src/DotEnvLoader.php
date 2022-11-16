@@ -1,62 +1,82 @@
 <?php
 namespace JaguarSoft\LaravelEnvLoader;
 
-use Dotenv\Loader;
 use Illuminate\Support\Str;
+use Dotenv\Loader;
+use Dotenv\Lines;
+use Dotenv\Parser;
 use Dotenv\Environment\DotenvFactory;
+use Dotenv\Environment\Adapter\ApacheAdapter;
+use Dotenv\Environment\Adapter\EnvConstAdapter;
+use Dotenv\Environment\Adapter\ServerConstAdapter;
+use PhpOption\Option;
 
 class DotEnvLoader extends Loader {
+    protected $filePath;
 
     public function __construct($filePath)
     {
+        $this->filePath = $filePath;
         $this->filePaths = [$filePath];
-        $this->envFactory = new DotenvFactory();
+        $this->envFactory = new DotenvFactory(
+            [
+                new ApacheAdapter(), 
+                new EnvConstAdapter(), 
+                new ServerConstAdapter()
+            ]);
         $this->setImmutable(false);
     }
 
     public function normaliseVariable($name, $value = null)
-    {
-        list($name, $value) = $this->normaliseEnvironmentVariable($name, $value);
+    {        
+        list($name, $value) = Parser::parse($name.'='.$value);
         return $this->env($value);
     }
 
-    protected function env($value)
+    public static function env($value, $default = null)
     {
-        switch (strtolower($value)) {
-            case 'true':
-            case '(true)':
-                return true;
-            case 'false':
-            case '(false)':
-                return false;
-            case 'empty':
-            case '(empty)':
-                return '';
-            case 'null':
-            case '(null)':
-                return;
-        }
-        if (strlen($value) > 1 && Str::startsWith($value, '"') && Str::endsWith($value, '"')) {
-            return substr($value, 1, -1);
-        }
-        return $value;
+        return Option::fromValue($value)
+            ->map(function ($value) {
+                switch (strtolower($value)) {
+                    case 'true':
+                    case '(true)':
+                        return true;
+                    case 'false':
+                    case '(false)':
+                        return false;
+                    case 'empty':
+                    case '(empty)':
+                        return '';
+                    case 'null':
+                    case '(null)':
+                        return null;
+                }
+
+                if (preg_match('/\A([\'"])(.*)\1\z/', $value, $matches)) {
+                    return $matches[2];
+                }
+
+                return $value;
+            })
+            ->getOrElse($default);
     }
 
     public function readVariables()
     {        
-        $this->ensureFileIsReadable();
-        $_envs = [];
-        $filePath = $this->filePath;
-        $lines = $this->readLinesFromFile($filePath);
-        foreach ($lines as $line) {
-            if (!$this->isComment($line) && $this->looksLikeSetter($line)) {                
-                list($name, $value) = $this->normaliseEnvironmentVariable($line, null);
-                $_envs[$name] = $value;
-            }
+        $content = self::findAndRead($this->filePaths);
+        $entries = Lines::process(preg_split("/(\r\n|\n|\r)/", $content));
+
+        $vars = [];
+
+        foreach ($entries as $entry) {
+            list($name, $value) = Parser::parse($entry);
+            $vars[$name] = $this->resolveNestedVariables($value);
         }
-        return $_envs;
+
+        return $vars;
     }
 
+    // Devuelve array con el numero de linea de cada env
     public function readLines()
     {
         $this->ensureFileIsReadable();        
@@ -69,28 +89,72 @@ class DotEnvLoader extends Loader {
         ini_set('auto_detect_line_endings', $autodetect);
         foreach ($lines as $k => $line) {
             if(empty($line)) continue;
-            if($this->isComment($line)) continue;
-            list($name, $value) = $this->normaliseEnvironmentVariable($line, null);
+            if(self::isCommentOrWhitespace($line)) continue;            
+            list($name, $value) = Parser::parse($line);
+            //$value = $this->resolveNestedVariables($value);
             $env_line[$name] = $k;
         }
 
         return $env_line;
     }
 
-    public function setEnvironmentVariable($name, $value = null)
+    /**
+     * Attempt to read the files in order.
+     *
+     * @param string[] $filePaths
+     *
+     * @throws \Dotenv\Exception\InvalidPathException
+     *
+     * @return string[]
+     */
+    protected static function findAndRead(array $filePaths)
     {
-        // If PHP is running as an Apache module and an existing
-        // Apache environment variable exists, overwrite it
-        if(is_bool($value)) { $value = $value ? 'true' : 'false'; }        
-        if (function_exists('apache_getenv') && function_exists('apache_setenv') && apache_getenv($name) !== false) {
-            apache_setenv($name, $value);
+        if ($filePaths === []) {
+            throw new InvalidPathException('At least one environment file path must be provided.');
         }
 
-        if (function_exists('putenv') && is_string($value)) {
-            putenv("$name=$value");
+        foreach ($filePaths as $filePath) {
+            $lines = self::readFromFile($filePath);
+            if ($lines->isDefined()) {
+                return $lines->get();
+            }
         }
 
-        $_ENV[$name] = $value;
-        $_SERVER[$name] = $value;
+        throw new InvalidPathException(
+            sprintf('Unable to read any of the environment file(s) at [%s].', implode(', ', $filePaths))
+        );
     }
+
+    /**
+     * Read the given file.
+     *
+     * @param string $filePath
+     *
+     * @return \PhpOption\Option
+     */
+    protected static function readFromFile($filePath)
+    {
+        $content = @file_get_contents($filePath);
+
+        return Option::fromValue($content, false);
+    }
+
+    /**
+     * Determine if the line in the file is a comment or whitespace.
+     *
+     * @param string $line
+     *
+     * @return bool
+     */
+    protected static function isCommentOrWhitespace($line)
+    {
+        if (trim($line) === '') {
+            return true;
+        }
+
+        $line = ltrim($line);
+
+        return isset($line[0]) && $line[0] === '#';
+    }
+
 }
