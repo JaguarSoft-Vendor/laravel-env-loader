@@ -21,6 +21,14 @@
     "extra": {
         "branch-alias": {
             "dev-master": "5.2.x-dev"
+        },
+        "laravel": {
+            "providers": [                
+                "JaguarSoft\\LaravelEnvLoader\\Provider\\AppBindProvider"
+            ],
+            "aliases": [
+                "JaguarSoft\\LaravelEnvLoader\\Facade\\JaguarVar"
+            ]
         }
     }
 }
