@@ -1,4 +1,4 @@
-# Laravel Debugbar Extension
+# Laravel Env Loader
 
 This package allows you to load env variables from external sources like database or yaml file.
 
