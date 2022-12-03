@@ -26,9 +26,9 @@
             "providers": [                
                 "JaguarSoft\\LaravelEnvLoader\\Provider\\AppBindProvider"
             ],
-            "aliases": [
-                "JaguarSoft\\LaravelEnvLoader\\Facade\\JaguarVar"
-            ]
+            "aliases": {
+                "JaguarVar": "JaguarSoft\\LaravelEnvLoader\\Facade\\JaguarVar"
+            }
         }
     }
 }
