@@ -24,7 +24,11 @@ class VarEnvBusiness {
         $envs = $loader->readVariables();
 		foreach($this->VarEnvs as $VarEnv) {
 			if(isset($envs[$VarEnv->codigo])) continue;
-			$loader->setEnvironmentVariable($VarEnv->codigo, $VarEnv->val());
+			$val = $VarEnv->val();
+			if(is_array($val)) {
+				$val = json_encode($val);
+			}
+			$loader->setEnvironmentVariable($VarEnv->codigo, $val);
 		}
 	}
 
@@ -34,7 +38,7 @@ class VarEnvBusiness {
 		},$this->VarEnvs);
 	}
 
-	function has($codigo) : bool {		
+	function has($codigo) : bool {
 		foreach($this->VarEnvs as $VarEnv) {
 			if($VarEnv->codigo === $codigo) {
 				return true;
@@ -43,7 +47,7 @@ class VarEnvBusiness {
 		return false;
 	} 
 
-	function hasOrEnv($codigo) : bool {				
+	function hasOrEnv($codigo) : bool {		
 		return 	$this->has($codigo) || isset($_ENV[$codigo]);
 	}
 
@@ -58,7 +62,14 @@ class VarEnvBusiness {
 
 	function getOrEnv($codigo, $default = null) {
 		return 	$this->has($codigo) ? $this->get($codigo) : 
-				(isset($_ENV[$codigo]) ? $this->handleEnv($_ENV[$codigo]) : env($codigo,$default));
+				(isset($_ENV[$codigo]) ? $this->handleEnv($_ENV[$codigo]) : $this->env($codigo,$default));
+	}
+
+	function env($codigo, $default) {
+		$env = env($codigo, $default);
+		$json = json_decode($env);
+		if(json_last_error() === JSON_ERROR_NONE) return $json;
+   		return $env;
 	}
 
 	protected function handleEnv($value) {
@@ -77,6 +88,8 @@ class VarEnvBusiness {
             case '(null)':
                 return null;
             default:
+            	$json = json_decode($value, true);            	
+            	if(json_last_error() === JSON_ERROR_NONE) return $json;
             	return $value;
         }
 	}
