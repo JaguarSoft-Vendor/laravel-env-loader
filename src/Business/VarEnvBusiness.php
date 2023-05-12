@@ -66,9 +66,12 @@ class VarEnvBusiness {
 	}
 
 	function env($codigo, $default) {
-		$env = env($codigo, $default);
-		$json = json_decode($env);
-		if(json_last_error() === JSON_ERROR_NONE) return $json;
+		$env = env($codigo, null);
+		if(is_null($env)) return $default;
+		if(is_string($env)) {
+			$json = json_decode($env);
+			if(json_last_error() === JSON_ERROR_NONE) return $json;
+		}
    		return $env;
 	}
 
