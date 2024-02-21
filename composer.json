@@ -16,8 +16,8 @@
     },
     "require": {
         "php": "^5.3.9 || ^7.0 || ^8.0",
-        "vlucas/phpdotenv": "^3.3",
-        "symfony/yaml": "^3.4"
+        "vlucas/phpdotenv": "^5.4",
+        "symfony/yaml": "^5.0"
     },
     "extra": {
         "branch-alias": {
