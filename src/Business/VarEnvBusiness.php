@@ -1,14 +1,12 @@
 <?php 
 namespace JaguarSoft\LaravelEnvLoader\Business;
 
-use JaguarSoft\LaravelEnvLoader\DotEnvLoader;
 use JaguarSoft\LaravelEnvLoader\Contract\VarEnvService;
 use JaguarSoft\LaravelEnvLoader\Model\VarEnv;
 
-use Dotenv\Environment\DotenvFactory;
-use Dotenv\Environment\Adapter\ApacheAdapter;
-use Dotenv\Environment\Adapter\EnvConstAdapter;
-use Dotenv\Environment\Adapter\ServerConstAdapter;
+use Dotenv\Repository\Adapter\PutenvAdapter;
+use Dotenv\Repository\RepositoryBuilder;
+use PhpOption\Option;
 
 class VarEnvBusiness {
 	protected $Service;	
@@ -20,18 +18,13 @@ class VarEnvBusiness {
 	}
 
 	public function setEnvs() {
-		$path = app()->environmentPath();
-        $file = app()->environmentFile();
-        if (!is_string($file)) $file = '.env';    
-        $filePath = rtrim($path, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$file;        
-        $loader = new DotEnvLoader(
-        	[$filePath],
-        	new DotenvFactory([new ApacheAdapter(), new EnvConstAdapter(),new ServerConstAdapter()]), 
-        	true);
-        $envs = $loader->readVariables();
+		$builder = RepositoryBuilder::createWithDefaultAdapters();
+		//$builder = $builder->addAdapter(PutenvAdapter::class);            
+		$repository = $builder->immutable()->make();
+
 		foreach($this->VarEnvs as $VarEnv) {
-			if(isset($envs[$VarEnv->codigo])) continue; // No sobreescribe variable .env
-			$loader->setEnvironmentVariable($VarEnv->codigo, $VarEnv->val());
+			if($repository->has($VarEnv->codigo)) continue; // No sobreescribe variable .env
+			$repository->set($VarEnv->codigo, $VarEnv->val());
 		}
 	}
 
