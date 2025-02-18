@@ -40,4 +40,9 @@ class DotEnvLoader extends Loader {
     public function getVariables() {
         return $this->envVariables;
     }
+
+    public function getVariable($name)
+    {
+        return $this->env($this->getEnvironmentVariable($name));
+    }
 }
