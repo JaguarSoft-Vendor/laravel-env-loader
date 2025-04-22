@@ -8,8 +8,7 @@ class Env extends Model
     protected $table = 'tb_envs';
     protected $primaryKey = 'id_env';
 
-    public $incrementing = true;
-    public $timestamps = false;
+    public $incrementing = true;    
 
     protected $fillable = 
         [
