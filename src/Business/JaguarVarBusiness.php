@@ -3,6 +3,7 @@ namespace JaguarSoft\LaravelEnvLoader\Business;
 
 use JaguarSoft\LaravelEnvLoader\Business\VarEnvBusiness;
 use JaguarSoft\LaravelEnvLoader\Contract\VarEnvService;
+use Illuminate\Support\Arr;
 
 class JaguarVarBusiness {
 	protected $business;
@@ -21,7 +22,7 @@ class JaguarVarBusiness {
 		if(count($keys) > 1) {
 			$pkey = array_shift($keys);			
 			if(!$this->business->hasOrEnv($pkey)) return $default;			
-			return array_get($this->business->getOrEnv($pkey), implode('.', $keys), $default);
+			return Arr::get($this->business->getOrEnv($pkey), implode('.', $keys), $default);
 		} else {
 			return $this->business->getOrEnv($key, $default);
 		}
