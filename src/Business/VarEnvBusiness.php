@@ -17,10 +17,12 @@ class VarEnvBusiness {
 	protected $loader;
 	protected $inmutable = false;
 
-	function __construct(VarEnvService $Service, $inmutable = false){
+	function __construct(VarEnvService $Service, $inmutable = false, $runInConsole = false){
 		$this->Service = $Service;
 		$this->inmutable = $inmutable;		
-		$this->VarEnvs = $this->Service->listar();
+		if(!app()->runningInConsole() || $runInConsole === true) {
+			$this->VarEnvs = $this->Service->listar();
+		}
 		$this->varenv_arr = collect($this->VarEnvs)->mapWithKeys(function($VarEnv){
 			return [$VarEnv->codigo => $VarEnv->val()];
 		});
