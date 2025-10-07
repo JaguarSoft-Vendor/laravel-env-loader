@@ -31,7 +31,7 @@ class VarEnvBusiness {
         if (!is_string($file)) $file = '.env';    
         $filePath = rtrim($path, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$file;        
         $this->loader = new DotEnvLoader([$filePath], new DotenvFactory([new EnvConstAdapter]), $inmutable);
-        $this->loader->load();
+        //if(file_exists($filePath)) $this->loader->load();
 	}
 
 	public function merge(VarEnvService $Service) {
@@ -48,8 +48,7 @@ class VarEnvBusiness {
 		return $this;		
 	}
 
-	public function setEnvs() {
-        $envs = $this->loader->getVariables();        
+	public function setEnvs() {        
 		foreach($this->VarEnvs as $VarEnv) {
 			$codigo = $VarEnv->codigo;			
 			$val = $VarEnv->val();
