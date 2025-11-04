@@ -15,8 +15,8 @@
         }
     },
     "require": {
-        "php": "^7.0 || ^8.0",
-        "vlucas/phpdotenv": "^3.3",
+        "php": "^7.2.5|^8.0",
+        "vlucas/phpdotenv": "^4.0",
         "symfony/yaml": "^3.4"
     },
     "extra": {
