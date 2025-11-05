@@ -64,10 +64,11 @@ class DotEnvLoader extends Loader {
                         case '(null)':
                             return null;
                     }
-
+                    /*
                     if (preg_match('/\A([\'"])(.*)\1\z/', $value, $matches)) {
                         return $matches[2];
                     }
+                    */
                 }                
 
                 return $value;
