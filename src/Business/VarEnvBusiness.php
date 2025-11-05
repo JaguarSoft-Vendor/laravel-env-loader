@@ -31,7 +31,7 @@ class VarEnvBusiness {
         $file = app()->environmentFile();
         if (!is_string($file)) $file = '.env';    
         $filePath = rtrim($path, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$file;
-        $adapters = [new EnvConstAdapter, new ServerConstAdapter, new PutenvAdapter];
+        $adapters = [new EnvConstAdapter, new ServerConstAdapter];
         $this->repository = RepositoryBuilder::create()
             ->withReaders($adapters)
             ->withWriters($adapters);           
