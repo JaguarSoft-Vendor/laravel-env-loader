@@ -34,9 +34,9 @@ class VarEnvBusiness {
         $adapters = [new EnvConstAdapter, new ServerConstAdapter, new PutenvAdapter];
         $this->repository = RepositoryBuilder::create()
             ->withReaders($adapters)
-            ->withWriters($adapters);            
+            ->withWriters($adapters);           
         if($inmutable) {
-        	$this->repository = $this->repository->inmutable();
+        	$this->repository = $this->repository->immutable();
         }
         $this->repository = $this->repository->make();              
 	}
