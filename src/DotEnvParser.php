@@ -1,7 +1,7 @@
 <?php
 namespace JaguarSoft\LaravelEnvLoader;
 
-use Dotenv\Parser;
+use Dotenv\Loader\Parser;
 
 class DotEnvParser extends Parser {
 

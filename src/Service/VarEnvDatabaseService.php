@@ -8,14 +8,13 @@ use JaguarSoft\LaravelEnvLoader\Model\Env as Model;
 use JaguarSoft\LaravelEnvLoader\Model\VarEnvBuilder;
 
 use Illuminate\Contracts\Foundation\Application;
-use Dotenv\Environment\DotenvFactory;
 use Exception;
 
 class VarEnvDatabaseService implements VarEnvService {	
 	protected $loader;
 
 	function __construct(Application $app){		
-		$this->loader = new DotEnvLoader(['.env'], new DotenvFactory());
+		$this->loader = new DotEnvLoader;
 	}
 
 	function listar() {

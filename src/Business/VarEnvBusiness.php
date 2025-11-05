@@ -5,21 +5,22 @@ use JaguarSoft\LaravelEnvLoader\DotEnvLoader;
 use JaguarSoft\LaravelEnvLoader\Contract\VarEnvService;
 use JaguarSoft\LaravelEnvLoader\Model\VarEnv;
 
-use Dotenv\Environment\DotenvFactory;
-use Dotenv\Environment\Adapter\PutenvAdapter;
-use Dotenv\Environment\Adapter\EnvConstAdapter;
-use Dotenv\Environment\Adapter\ServerConstAdapter;
+//use Dotenv\Environment\DotenvFactory;
+use Dotenv\Repository\RepositoryBuilder;
+use Dotenv\Repository\Adapter\EnvConstAdapter;
+use Dotenv\Repository\Adapter\PutenvAdapter;
+use Dotenv\Repository\Adapter\ServerConstAdapter;
 
 class VarEnvBusiness {
 	protected $Service;	
 	protected $VarEnvs = [];
-	protected $varenv_arr = [];
-	protected $loader;
+	protected $varenv_arr = [];	
 	protected $inmutable = false;
+	protected $repository;
 
 	function __construct(VarEnvService $Service, $inmutable = false, $runInConsole = false){
 		$this->Service = $Service;
-		$this->inmutable = $inmutable;		
+		$this->inmutable = $inmutable;
 		if(!app()->runningInConsole() || $runInConsole === true) {
 			$this->VarEnvs = $this->Service->listar();
 		}
@@ -30,31 +31,36 @@ class VarEnvBusiness {
         $file = app()->environmentFile();
         if (!is_string($file)) $file = '.env';    
         $filePath = rtrim($path, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$file;
-        $this->loader = new DotEnvLoader([$filePath], new DotenvFactory([new EnvConstAdapter]), $inmutable);
-        $this->loader->load();
+        $adapters = [new EnvConstAdapter, new ServerConstAdapter, new PutenvAdapter];
+        $this->repository = RepositoryBuilder::create()
+            ->withReaders($adapters)
+            ->withWriters($adapters);            
+        if($inmutable) {
+        	$this->repository = $this->repository->inmutable();
+        }
+        $this->repository = $this->repository->make();              
 	}
 
 	public function merge(VarEnvService $Service) {
 		$VarEnvs = $Service->listar();
 		foreach($VarEnvs as $VarEnv) {
-			$codigo = $VarEnv->codigo;			
+			$codigo = $VarEnv->codigo;
 			$val = $VarEnv->val();
 			if(!$this->inmutable || !isset($this->varenv_arr[$codigo])) {
 				array_push($this->VarEnvs, $VarEnv);
 				$this->varenv_arr[$codigo] = $val;
-				if(!is_array($val)) $this->loader->setEnvironmentVariable($codigo, $val);
+				if(!is_array($val)) $this->repository->set($codigo, $val);
 			}
 		}		
 		return $this;		
 	}
 
-	public function setEnvs() {
-        $envs = $this->loader->getVariables();        
+	public function setEnvs() {        
 		foreach($this->VarEnvs as $VarEnv) {
 			$codigo = $VarEnv->codigo;			
 			$val = $VarEnv->val();
 			$this->varenv_arr[$codigo] = $val;
-			if(!is_array($val)) $this->loader->setEnvironmentVariable($codigo, $val);
+			if(!is_array($val)) $this->repository->set($codigo, $val);
 		}
 	}
 
@@ -78,7 +84,7 @@ class VarEnvBusiness {
 
 	function getOrEnv($codigo, $default = null) {		
 		return 	$this->has($codigo) ? $this->get($codigo) : 
-				($this->loader->getEnvironmentVariable($codigo) ?? env($codigo,$default));
+				($this->repository->get($codigo) ?? env($codigo,$default));
 				//(isset($_ENV[$codigo]) ? $this->handleEnv($_ENV[$codigo]) : env($codigo,$default));
 	}
 
