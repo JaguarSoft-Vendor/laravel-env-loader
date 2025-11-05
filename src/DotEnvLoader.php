@@ -49,19 +49,21 @@ class DotEnvLoader extends Loader {
     {
         return Option::fromValue($value)
             ->map(function ($value) {
-                switch (strtolower($value)) {
-                    case 'true':
-                    case '(true)':
-                        return true;
-                    case 'false':
-                    case '(false)':
-                        return false;
-                    case 'empty':
-                    case '(empty)':
-                        return '';
-                    case 'null':
-                    case '(null)':
-                        return null;
+                if(is_string($value)) {
+                    switch (strtolower($value)) {
+                        case 'true':
+                        case '(true)':
+                            return true;
+                        case 'false':
+                        case '(false)':
+                            return false;
+                        case 'empty':
+                        case '(empty)':
+                            return '';
+                        case 'null':
+                        case '(null)':
+                            return null;
+                    }
                 }
 
                 if (preg_match('/\A([\'"])(.*)\1\z/', $value, $matches)) {
