@@ -21,16 +21,17 @@ class VarEnvBusiness {
 	function __construct(VarEnvService $Service, $inmutable = false, $runInConsole = false){
 		$this->Service = $Service;
 		$this->inmutable = $inmutable;
+		
 		if(!app()->runningInConsole() || $runInConsole === true) {
 			$this->VarEnvs = $this->Service->listar();
-		}
+		}		
 		$this->varenv_arr = collect($this->VarEnvs)->mapWithKeys(function($VarEnv){
 			return [$VarEnv->codigo => $VarEnv->val()];
-		});
+		});		
 		$path = app()->environmentPath();
         $file = app()->environmentFile();
         if (!is_string($file)) $file = '.env';    
-        $filePath = rtrim($path, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$file;
+        //$filePath = rtrim($path, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$file;
         $adapters = [new EnvConstAdapter, new ServerConstAdapter];
         $this->repository = RepositoryBuilder::create()
             ->withReaders($adapters)
@@ -38,7 +39,7 @@ class VarEnvBusiness {
         if($inmutable) {
         	$this->repository = $this->repository->immutable();
         }
-        $this->repository = $this->repository->make();              
+        $this->repository = $this->repository->make();        
 	}
 
 	public function merge(VarEnvService $Service) {
