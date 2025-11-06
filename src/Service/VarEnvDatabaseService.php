@@ -14,7 +14,6 @@ class VarEnvDatabaseService implements VarEnvService {
 	protected $loader;
 
 	function __construct(Application $app){		
-		//$this->loader = new DotEnvLoader('.env');
 	}
 
 	function listar() {

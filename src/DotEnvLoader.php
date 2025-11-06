@@ -2,30 +2,13 @@
 namespace JaguarSoft\LaravelEnvLoader;
 
 use Illuminate\Support\Str;
-use Dotenv\Loader;
-use Dotenv\Lines;
-use Dotenv\Parser;
-use Dotenv\Environment\DotenvFactory;
-use Dotenv\Environment\Adapter\ApacheAdapter;
-use Dotenv\Environment\Adapter\EnvConstAdapter;
-use Dotenv\Environment\Adapter\ServerConstAdapter;
+use Dotenv\Loader\Loader;
+use Dotenv\Parser\Lines;
+use Dotenv\Parser\Parser;
 use PhpOption\Option;
 
 class DotEnvLoader extends Loader {
     protected $filePath;
-
-    public function __construct($filePath)
-    {
-        $this->filePath = $filePath;
-        $this->filePaths = [$filePath];
-        $this->envFactory = new DotenvFactory(
-            [
-                new ApacheAdapter(), 
-                new EnvConstAdapter(), 
-                new ServerConstAdapter()
-            ]);
-        $this->setImmutable(false);
-    }
 
     public function normaliseVariable($name, $value = null)
     {        

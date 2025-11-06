@@ -3,8 +3,8 @@ namespace JaguarSoft\LaravelEnvLoader\Business;
 
 use JaguarSoft\LaravelEnvLoader\Contract\VarEnvService;
 use JaguarSoft\LaravelEnvLoader\Model\VarEnv;
+use JaguarSoft\LaravelEnvLoader\DotEnvLoader;
 
-use Dotenv\Repository\Adapter\PutenvAdapter;
 use Dotenv\Repository\RepositoryBuilder;
 use PhpOption\Option;
 
@@ -18,8 +18,7 @@ class VarEnvBusiness {
 	}
 
 	public function setEnvs() {
-		$builder = RepositoryBuilder::createWithDefaultAdapters();
-		//$builder = $builder->addAdapter(PutenvAdapter::class);            
+		$builder = RepositoryBuilder::createWithDefaultAdapters();		         
 		$repository = $builder->immutable()->make();
 
 		foreach($this->VarEnvs as $VarEnv) {
