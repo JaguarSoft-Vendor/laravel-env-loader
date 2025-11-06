@@ -1,20 +1,41 @@
 <?php 
 namespace JaguarSoft\LaravelEnvLoader\Business;
 
+use JaguarSoft\LaravelEnvLoader\DotEnvLoader;
 use JaguarSoft\LaravelEnvLoader\Contract\VarEnvService;
 use JaguarSoft\LaravelEnvLoader\Model\VarEnv;
-use JaguarSoft\LaravelEnvLoader\DotEnvLoader;
 
+//use Dotenv\Environment\DotenvFactory;
 use Dotenv\Repository\RepositoryBuilder;
-use PhpOption\Option;
+use Dotenv\Repository\Adapter\EnvConstAdapter;
+use Dotenv\Repository\Adapter\PutenvAdapter;
+use Dotenv\Repository\Adapter\ServerConstAdapter;
 
 class VarEnvBusiness {
 	protected $Service;	
 	protected $VarEnvs = [];
+	protected $varenv_arr = [];	
+	protected $inmutable = false;
+	protected $repository;
 
-	function __construct(VarEnvService $Service){
+	function __construct(VarEnvService $Service, $inmutable = false, $runInConsole = false){
 		$this->Service = $Service;
-		$this->VarEnvs = $this->Service->listar();		
+		$this->VarEnvs = $this->Service->listar();
+		$this->inmutable = $inmutable;		
+	}
+
+	public function merge(VarEnvService $Service) {
+		$VarEnvs = $Service->listar();
+		foreach($VarEnvs as $VarEnv) {
+			$codigo = $VarEnv->codigo;
+			$val = $VarEnv->val();
+			if(!$this->inmutable || !isset($this->varenv_arr[$codigo])) {
+				array_push($this->VarEnvs, $VarEnv);
+				$this->varenv_arr[$codigo] = $val;
+				if(!is_array($val)) $this->repository->set($codigo, $val);
+			}
+		}		
+		return $this;		
 	}
 
 	public function setEnvs() {
@@ -25,7 +46,7 @@ class VarEnvBusiness {
 			if($repository->has($VarEnv->codigo)) continue; // No sobreescribe variable .env
 			$repository->set($VarEnv->codigo, $VarEnv->val());
 		}
-	}
+	}	
 
 	function all($value = false) {
 		return array_map(function($Var) use ($value) {			
@@ -34,12 +55,7 @@ class VarEnvBusiness {
 	}
 
 	function has($codigo) : bool {		
-		foreach($this->VarEnvs as $VarEnv) {
-			if($VarEnv->codigo === $codigo) {
-				return true;
-			}
-		};
-		return false;
+		return isset($this->varenv_arr[$codigo]);		
 	} 
 
 	function hasOrEnv($codigo) : bool {				
@@ -47,17 +63,13 @@ class VarEnvBusiness {
 	}
 
 	function get($codigo, $default = null) {
-		foreach($this->VarEnvs as $VarEnv) {
-			if($VarEnv->codigo === $codigo) {
-				return $VarEnv->val();
-			}
-		};
-		return $default;
+		return $this->varenv_arr[$codigo] ?? $default;		
 	}
 
-	function getOrEnv($codigo, $default = null) {
+	function getOrEnv($codigo, $default = null) {		
 		return 	$this->has($codigo) ? $this->get($codigo) : 
-				(isset($_ENV[$codigo]) ? DotEnvLoader::env($_ENV[$codigo]) : env($codigo,$default));
+				($this->repository->get($codigo) ?? env($codigo,$default));
+				//(isset($_ENV[$codigo]) ? $this->handleEnv($_ENV[$codigo]) : env($codigo,$default));
 	}
 
 	function post($codigo, $valor) {
@@ -73,4 +85,4 @@ class VarEnvBusiness {
 	function delete($codigo, $valor) {
 		$this->Service->borrar($codigo, $valor);
 	}
-}	
+}

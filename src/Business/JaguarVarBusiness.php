@@ -3,12 +3,18 @@ namespace JaguarSoft\LaravelEnvLoader\Business;
 
 use JaguarSoft\LaravelEnvLoader\Business\VarEnvBusiness;
 use JaguarSoft\LaravelEnvLoader\Contract\VarEnvService;
+use Illuminate\Support\Arr;
 
 class JaguarVarBusiness {
 	protected $business;
 
-	function __construct(VarEnvService $service) {
-		$this->business = new VarEnvBusiness($service);
+	function __construct(VarEnvService $service, $inmutable = false) {
+		$this->business = new VarEnvBusiness($service,$inmutable);
+	}
+
+	function merge(VarEnvService $Service) {
+		$this->business->merge($Service);
+		return $this;
 	}
 
 	function env($key, $default = null, $val = null) {		
@@ -16,7 +22,7 @@ class JaguarVarBusiness {
 		if(count($keys) > 1) {
 			$pkey = array_shift($keys);			
 			if(!$this->business->hasOrEnv($pkey)) return $default;			
-			return array_get($this->business->getOrEnv($pkey), implode('.', $keys), $default);
+			return Arr::get($this->business->getOrEnv($pkey), implode('.', $keys), $default);
 		} else {
 			return $this->business->getOrEnv($key, $default);
 		}
@@ -25,8 +31,7 @@ class JaguarVarBusiness {
 	function all() {
 		$envs = [];
 		foreach($this->business->all() as $VarEnv) {
-			$envs[$VarEnv->codigo] = $VarEnv->val();
-			//$envs[$VarEnv->codigo] = $VarEnv;
+			$envs[$VarEnv->codigo] = $VarEnv->val();			
 		}
 		return $envs;
 	}
@@ -58,4 +63,4 @@ class JaguarVarBusiness {
 		return $this->env($key) === $comp ? $if : $else;
 	}
    
-}	
+}
