@@ -10,6 +10,52 @@ use PhpOption\Option;
 class DotEnvLoader extends Loader {
     protected $filePath;
 
+    /**
+     * Load the given environment file content into the repository.
+     *
+     * @param \Dotenv\Repository\RepositoryInterface $repository
+     * @param string                                 $content
+     *
+     * @throws \Dotenv\Exception\InvalidFileException
+     *
+     * @return array<string,string|null>
+     */
+    public function read(RepositoryInterface $repository, $content)
+    {
+        return $this->getEntries(
+            $repository,
+            Lines::process(Regex::split("/(\r\n|\n|\r)/", $content)->getSuccess())
+        );
+    }
+
+    /**
+     * Process the environment variable entries.
+     *
+     * We'll fill out any nested variables, and acually set the variable using
+     * the underlying environment variables instance.
+     *
+     * @param \Dotenv\Repository\RepositoryInterface $repository
+     * @param string[]                               $entries
+     *
+     * @throws \Dotenv\Exception\InvalidFileException
+     *
+     * @return array<string,string|null>
+     */
+    protected function getEntries(RepositoryInterface $repository, array $entries)
+    {
+        $vars = [];
+
+        foreach ($entries as $entry) {
+            list($name, $value) = Parser::parse($entry);
+            if ($this->whitelist === null || in_array($name, $this->whitelist, true)) {
+                $vars[$name] = self::resolveNestedVariables($repository, $value);
+                //$repository->set($name, $vars[$name]);
+            }
+        }
+
+        return $vars;
+    }
+    
     public function normaliseVariable($name, $value = null)
     {        
         list($name, $value) = Parser::parse($name.'='.$value);
