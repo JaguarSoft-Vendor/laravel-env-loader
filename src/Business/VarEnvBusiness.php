@@ -22,6 +22,7 @@ class VarEnvBusiness {
 		$this->Service = $Service;
 		$this->VarEnvs = $this->Service->listar();
 		$this->inmutable = $inmutable;		
+		$this->repository = RepositoryBuilder::createWithDefaultAdapters()->immutable()->make();
 	}
 
 	public function merge(VarEnvService $Service) {
@@ -38,13 +39,10 @@ class VarEnvBusiness {
 		return $this;		
 	}
 
-	public function setEnvs() {
-		$builder = RepositoryBuilder::createWithDefaultAdapters();		         
-		$repository = $builder->immutable()->make();
-
+	public function setEnvs() {		
 		foreach($this->VarEnvs as $VarEnv) {
-			if($repository->has($VarEnv->codigo)) continue; // No sobreescribe variable .env
-			$repository->set($VarEnv->codigo, $VarEnv->val());
+			if($this->repository->has($VarEnv->codigo)) continue; // No sobreescribe variable .env
+			$this->repository->set($VarEnv->codigo, $VarEnv->val());
 		}
 	}	
 
@@ -68,8 +66,7 @@ class VarEnvBusiness {
 
 	function getOrEnv($codigo, $default = null) {		
 		return 	$this->has($codigo) ? $this->get($codigo) : 
-				($this->repository->get($codigo) ?? env($codigo,$default));
-				//(isset($_ENV[$codigo]) ? $this->handleEnv($_ENV[$codigo]) : env($codigo,$default));
+				($this->repository->get($codigo) ?? env($codigo,$default));				
 	}
 
 	function post($codigo, $valor) {
