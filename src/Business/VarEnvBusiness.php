@@ -5,11 +5,9 @@ use JaguarSoft\LaravelEnvLoader\DotEnvLoader;
 use JaguarSoft\LaravelEnvLoader\Contract\VarEnvService;
 use JaguarSoft\LaravelEnvLoader\Model\VarEnv;
 
-//use Dotenv\Environment\DotenvFactory;
 use Dotenv\Repository\RepositoryBuilder;
-use Dotenv\Repository\Adapter\EnvConstAdapter;
-use Dotenv\Repository\Adapter\PutenvAdapter;
-use Dotenv\Repository\Adapter\ServerConstAdapter;
+use Dotenv\Store\StoreBuilder;
+use Dotenv\Parser\Parser;
 
 class VarEnvBusiness {
 	protected $Service;	
@@ -21,7 +19,13 @@ class VarEnvBusiness {
 	function __construct(VarEnvService $Service, $inmutable = false, $runInConsole = false){
 		$this->Service = $Service;
 		$this->VarEnvs = $this->Service->listar();
-		$this->inmutable = $inmutable;		
+		$this->inmutable = $inmutable;				
+		if(!app()->runningInConsole() || $runInConsole === true) {
+			$this->VarEnvs = $this->Service->listar();
+		}
+		$this->varenv_arr = collect($this->VarEnvs)->mapWithKeys(function($VarEnv){
+			return [$VarEnv->codigo => $VarEnv->val()];
+		});
 		$this->repository = RepositoryBuilder::createWithDefaultAdapters()->immutable()->make();
 	}
 

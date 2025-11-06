@@ -2,60 +2,51 @@
 namespace JaguarSoft\LaravelEnvLoader;
 
 use Illuminate\Support\Str;
-use Dotenv\Loader\Loader;
-use Dotenv\Parser\Lines;
+use Dotenv\Loader\Resolver;
+use Dotenv\Parser\Entry;
 use Dotenv\Parser\Parser;
+use Dotenv\Parser\Value;
+use Dotenv\Repository\RepositoryInterface;
 use PhpOption\Option;
 
-class DotEnvLoader extends Loader {
-    protected $filePath;
+class DotEnvLoader {    
 
     /**
-     * Load the given environment file content into the repository.
+     * Load the given entries into the repository.
+     *
+     * We'll substitute any nested variables, and send each variable to the
+     * repository, with the effect of actually mutating the environment.
      *
      * @param \Dotenv\Repository\RepositoryInterface $repository
-     * @param string                                 $content
+     * @param \Dotenv\Parser\Entry[]                 $entries
      *
-     * @throws \Dotenv\Exception\InvalidFileException
-     *
-     * @return array<string,string|null>
+     * @return array<string, string|null>
      */
-    public function read(RepositoryInterface $repository, $content)
+    public function read(RepositoryInterface $repository, array $entries)
     {
-        return $this->getEntries(
-            $repository,
-            Lines::process(Regex::split("/(\r\n|\n|\r)/", $content)->getSuccess())
-        );
-    }
+        /** @var array<string, string|null> */
+        return \array_reduce($entries, static function (array $vars, Entry $entry) use ($repository) {
+            $name = $entry->getName();
 
-    /**
-     * Process the environment variable entries.
-     *
-     * We'll fill out any nested variables, and acually set the variable using
-     * the underlying environment variables instance.
-     *
-     * @param \Dotenv\Repository\RepositoryInterface $repository
-     * @param string[]                               $entries
-     *
-     * @throws \Dotenv\Exception\InvalidFileException
-     *
-     * @return array<string,string|null>
-     */
-    protected function getEntries(RepositoryInterface $repository, array $entries)
-    {
-        $vars = [];
+            $value = $entry->getValue()->map(static function (Value $value) use ($repository) {
+                return Resolver::resolve($repository, $value);
+            });
 
-        foreach ($entries as $entry) {
-            list($name, $value) = Parser::parse($entry);
-            if ($this->whitelist === null || in_array($name, $this->whitelist, true)) {
-                $vars[$name] = self::resolveNestedVariables($repository, $value);
-                //$repository->set($name, $vars[$name]);
+            if ($value->isDefined()) {
+                $inner = $value->get();
+                //if ($repository->set($name, $inner)) {
+                    return \array_merge($vars, [$name => $inner]);
+                //}
+            } else {
+                //if ($repository->clear($name)) {
+                    return \array_merge($vars, [$name => null]);
+                //}
             }
-        }
 
-        return $vars;
-    }
-    
+            return $vars;
+        }, []);
+    }    
+
     public function normaliseVariable($name, $value = null)
     {        
         list($name, $value) = Parser::parse($name.'='.$value);
@@ -89,7 +80,7 @@ class DotEnvLoader extends Loader {
             })
             ->getOrElse($default);
     }
-
+    /*
     public function readVariables()
     {        
         $content = self::findAndRead($this->filePaths);
@@ -104,13 +95,13 @@ class DotEnvLoader extends Loader {
 
         return $vars;
     }
-
+    */
     // Devuelve array con el numero de linea de cada env
+    /*
     public function readLines()
     {
         $this->ensureFileIsReadable();        
-        $filePath = $this->filePath;
-        //$lines = $this->readLinesFromFile($filePath);
+        $filePath = $this->filePath;        
         $autodetect = ini_get('auto_detect_line_endings');
         ini_set('auto_detect_line_endings', '1');
         $lines = file($filePath, FILE_IGNORE_NEW_LINES);
@@ -126,6 +117,7 @@ class DotEnvLoader extends Loader {
 
         return $env_line;
     }
+    */
 
     /**
      * Attempt to read the files in order.
@@ -136,6 +128,7 @@ class DotEnvLoader extends Loader {
      *
      * @return string[]
      */
+    /*
     protected static function findAndRead(array $filePaths)
     {
         if ($filePaths === []) {
@@ -153,6 +146,7 @@ class DotEnvLoader extends Loader {
             sprintf('Unable to read any of the environment file(s) at [%s].', implode(', ', $filePaths))
         );
     }
+    */
 
     /**
      * Read the given file.
@@ -161,12 +155,14 @@ class DotEnvLoader extends Loader {
      *
      * @return \PhpOption\Option
      */
+    /*
     protected static function readFromFile($filePath)
     {
         $content = @file_get_contents($filePath);
 
         return Option::fromValue($content, false);
     }
+    */
 
     /**
      * Determine if the line in the file is a comment or whitespace.
@@ -175,6 +171,7 @@ class DotEnvLoader extends Loader {
      *
      * @return bool
      */
+    /*
     protected static function isCommentOrWhitespace($line)
     {
         if (trim($line) === '') {
@@ -185,5 +182,5 @@ class DotEnvLoader extends Loader {
 
         return isset($line[0]) && $line[0] === '#';
     }
-
+    */
 }
