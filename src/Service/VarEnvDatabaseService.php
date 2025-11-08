@@ -86,4 +86,4 @@ class VarEnvDatabaseService implements VarEnvService {
 	function existe($codigo) {
 		return Model::where('codigo',$codigo)->first();
 	}
-}	
+}
