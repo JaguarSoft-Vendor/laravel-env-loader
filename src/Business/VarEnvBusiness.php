@@ -47,7 +47,8 @@ class VarEnvBusiness {
 
 	public function setEnvs() {		
 		foreach($this->VarEnvs as $VarEnv) {
-			if($this->repository->has($VarEnv->codigo)) continue; // No sobreescribe variable .env
+			if($this->repository->has($VarEnv->codigo)) continue; // No sobreescribe variable .env		
+			$val = $VarEnv->val();
 			if(!is_array($val)) $this->repository->set($VarEnv->codigo, $VarEnv->val());
 		}
 	}	
