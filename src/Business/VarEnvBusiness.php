@@ -39,7 +39,7 @@ class VarEnvBusiness {
 			if(!$this->inmutable || !isset($this->varenv_arr[$codigo])) {
 				array_push($this->VarEnvs, $VarEnv);
 				$this->varenv_arr[$codigo] = $val;
-				if(is_string($val)) $this->repository->set($codigo, $val);
+				if(!is_array($val)) $this->repository->set($codigo, $val);
 			}
 		}		
 		return $this;		
@@ -48,7 +48,7 @@ class VarEnvBusiness {
 	public function setEnvs() {		
 		foreach($this->VarEnvs as $VarEnv) {
 			if($this->repository->has($VarEnv->codigo)) continue; // No sobreescribe variable .env
-			if(is_string($VarEnv->val())) $this->repository->set($VarEnv->codigo, $VarEnv->val());
+			if(!is_array($val)) $this->repository->set($VarEnv->codigo, $VarEnv->val());
 		}
 	}	
 
