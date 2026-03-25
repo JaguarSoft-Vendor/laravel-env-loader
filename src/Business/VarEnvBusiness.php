@@ -20,7 +20,9 @@ class VarEnvBusiness {
 		$this->Service = $Service;
 		$this->VarEnvs = $this->Service->listar();
 		$this->inmutable = $inmutable;				
-		if(!app()->runningInConsole() || $runInConsole === true) {
+		$appRunningInConsole = app()->runningInConsole();
+    	if(is_null($runInConsole)) $runInConsole = env('VARENV_CONSOLE', true);
+		if(!$appRunningInConsole || $runInConsole === true) {
 			$this->VarEnvs = $this->Service->listar();
 		}
 		$this->varenv_arr = collect($this->VarEnvs)->mapWithKeys(function($VarEnv){
