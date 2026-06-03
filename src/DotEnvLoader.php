@@ -99,6 +99,20 @@ class DotEnvLoader extends Loader {
     }
 
     /**
+     * Ensures the given filePath is readable.
+     *
+     * @throws \Dotenv\Exception\InvalidPathException
+     *
+     * @return void
+     */
+    protected function ensureFileIsReadable()
+    {
+        if (!is_readable($this->filePath) || !is_file($this->filePath)) {
+            throw new InvalidPathException(sprintf('Unable to read the environment file at %s.', $this->filePath));
+        }
+    }
+
+    /**
      * Attempt to read the files in order.
      *
      * @param string[] $filePaths
