@@ -13,9 +13,15 @@ use Exception;
 
 class VarEnvDatabaseService implements VarEnvService {	
 	protected $loader;
+	protected $runInConsole = true;
 
 	function __construct(Application $app){		
 		$this->loader = new DotEnvLoader(['.env'], new DotenvFactory());
+		$this->runInConsole = env('ENV_DB_IN_CONSOLE', true);
+	}
+
+	function runInConsole() {
+		return $this->runInConsole;
 	}
 
 	function listar() {

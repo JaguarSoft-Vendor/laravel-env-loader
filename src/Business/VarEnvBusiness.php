@@ -17,10 +17,10 @@ class VarEnvBusiness {
 	protected $loader;
 	protected $inmutable = false;
 
-	function __construct(VarEnvService $Service, $inmutable = false, $runInConsole = false){
+	function __construct(VarEnvService $Service, $inmutable = false){
 		$this->Service = $Service;
 		$this->inmutable = $inmutable;		
-		if(!app()->runningInConsole() || $runInConsole === true) {
+		if(!app()->runningInConsole() || $this->Service->runInConsole() === true) {
 			$this->VarEnvs = $this->Service->listar();
 		}
 		$this->varenv_arr = collect($this->VarEnvs)->mapWithKeys(function($VarEnv){
@@ -35,16 +35,18 @@ class VarEnvBusiness {
 	}
 
 	public function merge(VarEnvService $Service) {
-		$VarEnvs = $Service->listar();
-		foreach($VarEnvs as $VarEnv) {
-			$codigo = $VarEnv->codigo;			
-			$val = $VarEnv->val();
-			if(!$this->inmutable || !isset($this->varenv_arr[$codigo])) {
-				array_push($this->VarEnvs, $VarEnv);
-				$this->varenv_arr[$codigo] = $val;
-				if(!is_array($val)) $this->loader->setEnvironmentVariable($codigo, $val);
+		if(!app()->runningInConsole() || $this->Service->runInConsole() === true) {
+			$VarEnvs = $Service->listar();
+			foreach($VarEnvs as $VarEnv) {
+				$codigo = $VarEnv->codigo;			
+				$val = $VarEnv->val();
+				if(!$this->inmutable || !isset($this->varenv_arr[$codigo])) {
+					array_push($this->VarEnvs, $VarEnv);
+					$this->varenv_arr[$codigo] = $val;
+					if(!is_array($val)) $this->loader->setEnvironmentVariable($codigo, $val);
+				}
 			}
-		}		
+		}
 		return $this;		
 	}
 

@@ -12,9 +12,15 @@ use Symfony\Component\Yaml\Exception\ParseException;
 
 class VarEnvYamlService implements VarEnvService {
 	protected $app;
+	protected $runInConsole = true;
 
 	function __construct(Application $app){
 		$this->app = $app;
+		$this->runInConsole = env('ENV_YAML_IN_CONSOLE', true);
+	}
+
+	function runInConsole() {
+		return $this->runInConsole;
 	}
 
 	function listar() {

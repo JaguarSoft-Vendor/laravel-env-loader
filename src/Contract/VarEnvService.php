@@ -12,4 +12,5 @@ interface VarEnvService {
 	function crearEnv(Env $Env);
 	function actualizarEnv(Env $Env);
 	function existe($codigo);
+	function runInConsole();
 }	
