@@ -14,10 +14,15 @@ use Exception;
 class VarEnvDatabaseService implements VarEnvService {	
 	protected $loader;
 	protected $runInConsole = true;
+	protected $provider = 'database';
 
 	function __construct(Application $app){		
 		$this->loader = new DotEnvLoader(['.env'], new DotenvFactory());
 		$this->runInConsole = env('ENV_DB_IN_CONSOLE', true);
+	}
+
+	function getProvider() {
+		return $this->provider;
 	}
 
 	function runInConsole() {
@@ -31,6 +36,7 @@ class VarEnvDatabaseService implements VarEnvService {
 			if(!$VarEnv->tipo && $VarEnv->tipo == ''){
 				$VarEnv->valor = $this->loader->normaliseVariable($VarEnv->codigo,$VarEnv->valor);				
 			}
+			$VarEnv->provider = $this->provider;
 			array_push($varenvs, $VarEnv);			
 		}
 		return $varenvs;
@@ -94,4 +100,4 @@ class VarEnvDatabaseService implements VarEnvService {
 	function existe($codigo) {
 		return Model::where('codigo',$codigo)->first();
 	}
-}	
+}

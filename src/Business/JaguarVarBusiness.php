@@ -28,12 +28,8 @@ class JaguarVarBusiness {
 		}
 	}
 
-	function all() {
-		$envs = [];
-		foreach($this->business->all() as $VarEnv) {
-			$envs[$VarEnv->codigo] = $VarEnv->val();			
-		}
-		return $envs;
+	function all($value = false) {
+		return $this->business->all($value);
 	}
 
 	protected function ifElse($key, $comp, callable $compare = null, callable $if = null, callable $else = null) {
@@ -59,8 +55,7 @@ class JaguarVarBusiness {
 		}, $callback, $else);
 	}
 
-	public function ifEnv($key,$comp,$if,$else = null) {
+	public function ifEnv($key, $comp, $if, $else = null) {
 		return $this->env($key) === $comp ? $if : $else;
 	}
-   
 }

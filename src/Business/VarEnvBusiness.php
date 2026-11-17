@@ -61,9 +61,11 @@ class VarEnvBusiness {
 	}
 
 	function all($value = false) {
-		return array_map(function($Var) use ($value) {			
-			return $value === true ? $Var->val() : $Var;			
-		},$this->VarEnvs);
+		return collect($this->VarEnvs)
+			->mapWithKeys(function ($VarEnv) use ($value){
+				return [$VarEnv->codigo => ($value ? $VarEnv->val() : $VarEnv)];
+			})
+			->all();
 	}
 
 	function has($codigo) : bool {		

@@ -13,10 +13,15 @@ use Symfony\Component\Yaml\Exception\ParseException;
 class VarEnvYamlService implements VarEnvService {
 	protected $app;
 	protected $runInConsole = true;
+	protected $provider = 'yaml';
 
 	function __construct(Application $app){
 		$this->app = $app;
 		$this->runInConsole = env('ENV_YAML_IN_CONSOLE', true);
+	}
+
+	function getProvider() {
+		return $this->provider;
 	}
 
 	function runInConsole() {
@@ -35,16 +40,18 @@ class VarEnvYamlService implements VarEnvService {
         } catch (ParseException $e) {
         }
 		foreach($envs as $name => $value) {
-			array_push($varenvs, VarEnv::from($name,$value));
+			$VarEnv = VarEnv::from($name,$value);
+			$VarEnv->provider = $this->provider;
+			array_push($varenvs, $VarEnv);
 		}		
 		return $varenvs;
 	}
 
-	function actualizar($codigo,$valor) {
+	function actualizar($codigo, $valor) {
 		throw new Exception("VarEnvYamlService.actualizar No Implementado");
 	}
 
-	function crear($codigo,$valor,$bloqueado = false) {
+	function crear($codigo, $valor, $bloqueado = false) {
 		throw new Exception("VarEnvYamlService.crear No Implementado");
 	}
 
